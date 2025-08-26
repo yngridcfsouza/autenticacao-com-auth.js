@@ -1,4 +1,3 @@
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -10,12 +9,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export function RegisterForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+interface IRegisterFormProps {
+  registerAction: (formData: FormData) => Promise<void>;
+}
+
+export function RegisterForm({ registerAction }: IRegisterFormProps) {
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Registre sua conta</CardTitle>
@@ -24,12 +24,13 @@ export function RegisterForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form action={registerAction} className="grid w-full gap-4" noValidate>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="name">Seu nome</Label>
                 <Input
                   id="name"
+                  name="name"
                   type="text"
                   placeholder="Digite seu nome"
                   required
@@ -40,6 +41,7 @@ export function RegisterForm({
                 <Label htmlFor="email">E-mail</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@exemplo.com"
                   required
@@ -58,6 +60,7 @@ export function RegisterForm({
                 </div>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="********"
                   required
@@ -67,7 +70,8 @@ export function RegisterForm({
               <div className="grid gap-3">
                 <Label htmlFor="confirmPassword">Confirme sua senha</Label>
                 <Input
-                  id="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
                   type="password"
                   placeholder="********"
                   required
@@ -83,14 +87,14 @@ export function RegisterForm({
                 </Button>
               </div>
             </div>
-            <div className="mt-4 text-center text-sm">
-              Já tem uma conta?{" "}
-              <a href="/login" className="underline underline-offset-4">
-                Entre agora
-              </a>
-              !
-            </div>
           </form>
+          <div className="mt-4 text-center text-sm">
+            Já tem uma conta?{" "}
+            <a href="/login" className="underline underline-offset-4">
+              Entre agora
+            </a>
+            !
+          </div>
         </CardContent>
       </Card>
     </div>
