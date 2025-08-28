@@ -1,5 +1,8 @@
-import { cn } from "@/lib/utils"
+'use client'
+import { useActionState } from "react";
+
 import { Button } from "@/components/ui/button"
+import { Loader2Icon } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -9,13 +12,27 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+interface ILoginFormProps {
+  loginAction: (formData: FormData) => Promise<void | { error: string }>;
+  googleLoginAction: () => Promise<void>;
+}
+
+export function LoginForm({ loginAction, googleLoginAction }: ILoginFormProps) {
+  const [, dispatchAction, isPending] = useActionState(
+    async (_previousData: any, formData: FormData) => {
+      const response = await loginAction(formData);
+
+      if (response?.error) {
+        toast.error(response.error);
+      }
+    },
+    null,
+  );
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Acesse sua conta</CardTitle>
@@ -24,12 +41,13 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form action={dispatchAction} className="grid w-full gap-4" noValidate>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="email">E-mail</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@exemplo.com"
                   required
@@ -47,16 +65,23 @@ export function LoginForm({
                 </div>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="********"
                   required
                 />
               </div>
               <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
-                  Entrar
+                <Button type="submit" className="w-full" disabled={isPending}>
+                  {isPending ? <Loader2Icon /> : 'Entrar'}
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  type="button"
+                  disabled={isPending}
+                  onClick={googleLoginAction}
+                >
                   Entrar com o Google
                 </Button>
               </div>
